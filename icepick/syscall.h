@@ -3,11 +3,25 @@
 #include <string>
 #include <Windows.h>
 
+#include "external/skCrypt.h"
+
 // The required system call could not be found
 #define PC_SYSC_E_NOT_FOUND             -2
 
 // Allocation of RWX memory using VirtualAlloc failed, check GetLastError()
 #define PC_SYSC_E_ALLOC_FAILED          -3
+
+namespace pc_system_calls
+{
+	auto sk_NtClose = skCrypt("NtClose");                       // NtClose
+	auto sk_NtAVM	= skCrypt("NtAllocateVirtualMemory");       // NtAllocateVirtualMemory
+	auto sk_NtPVM   = skCrypt("NtProtectVirtualMemory");        // NtProtectVirtualMemory
+	auto sk_NtFVM	= skCrypt("NtFreeVirtualMemory");           // NtFreeVirtualMemory
+	auto sk_NtCF	= skCrypt("NtCreateFile");                  // NtCreateFile
+	auto sk_NtQIF	= skCrypt("NtQueryInformationFile");        // NtQueryInformationFile
+	auto sk_NtRF	= skCrypt("NtReadFile");                    // NtReadFile
+	auto sk_NtWFSO	= skCrypt("NtWaitForSingleObject");         // NtWaitForSingleObject
+}
 
 class syscall_handler
 {

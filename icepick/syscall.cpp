@@ -1,6 +1,5 @@
 #include "syscall.h"
 
-#include "external/skCrypt.h"
 #include "external/macros.h"
 
 syscall_handler::syscall_handler()
