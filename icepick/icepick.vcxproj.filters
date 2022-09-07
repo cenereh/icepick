@@ -24,9 +24,21 @@
     <ClInclude Include="external\macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="winapi\winapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ntdll\nt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ntdll\prototypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="syscall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="winapi\winapi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
