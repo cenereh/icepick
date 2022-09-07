@@ -24,12 +24,18 @@
     <ClCompile Include="encrypt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="build.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="filesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="encrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="build.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

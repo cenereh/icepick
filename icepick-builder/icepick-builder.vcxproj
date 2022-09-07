@@ -139,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="build.cpp" />
     <ClCompile Include="encrypt.cpp" />
     <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="build.h" />
     <ClInclude Include="encrypt.h" />
     <ClInclude Include="filesystem.h" />
   </ItemGroup>

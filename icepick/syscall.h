@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 #include "external/skCrypt.h"
+#include "external/macros.h"
 
 // The required system call could not be found
 #define PC_SYSC_E_NOT_FOUND             -2

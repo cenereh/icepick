@@ -1,6 +1,7 @@
 #include "filesystem.h"
 #include <Windows.h>
 
+#include "../log.h"
 
 /// <summary>
 /// Reads a file from disk
@@ -15,7 +16,7 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
 
     if (FileHandle == INVALID_HANDLE_VALUE)
     {
-        // todo: log
+        mwinapi_fail(L"CreateFile");
         return false;
     }
 
@@ -23,7 +24,7 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
 
     if (Size == 0)
     {
-        // todo: log
+        mwinapi_fail(L"GetFileSize");
         return false;
     }
 
@@ -31,13 +32,13 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
 
     if (*Buffer == nullptr)
     {
-        // todo: log
+        mwinapi_fail(L"VirtualAlloc");
         return false;
     }
 
     if (!ReadFile(FileHandle, *Buffer, Size, nullptr, nullptr))
     {
-        // todo: log
+        mwinapi_fail(L"ReadFile");
         return false;
     }
 
@@ -57,13 +58,13 @@ bool filesystem::FsWriteFile(const std::wstring Path, uint8_t* Buffer, uint32_t 
 
     if (FileHandle == INVALID_HANDLE_VALUE)
     {
-        // todo: log
+        mwinapi_fail(L"CreateFile");
         return false;
     }
 
     if (!WriteFile(FileHandle, Buffer, Size, nullptr, nullptr))
     {
-        // todo: log
+        mwinapi_fail(L"WriteFile");
         return false;
     }
 
