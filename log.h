@@ -150,9 +150,7 @@ private:
 	std::string m_FileName;
 };
 
-namespace {
-	icepicklog* gLogInst = nullptr;
-}
+icepicklog* gLogInst = nullptr;
 
 #ifdef _DEBUG
 #define mlog(cont, ...)				gLogInst->debug_fwprintf(cont, __VA_ARGS__)

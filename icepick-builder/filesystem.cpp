@@ -42,6 +42,7 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
         return false;
     }
 
+    CloseHandle(FileHandle);
     return true;
 }
 
@@ -54,7 +55,7 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
 /// <returns>True if the write has been successful, false if not.</returns>
 bool filesystem::FsWriteFile(const std::wstring Path, uint8_t* Buffer, uint32_t Size)
 {
-    HANDLE FileHandle = CreateFile(Path.c_str(), GENERIC_READ, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+    HANDLE FileHandle = CreateFile(Path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 
     if (FileHandle == INVALID_HANDLE_VALUE)
     {
@@ -68,5 +69,6 @@ bool filesystem::FsWriteFile(const std::wstring Path, uint8_t* Buffer, uint32_t 
         return false;
     }
 
+    CloseHandle(FileHandle);
     return true;
 }
