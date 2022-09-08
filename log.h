@@ -156,6 +156,8 @@ icepicklog* gLogInst = nullptr;
 #define mlog(cont, ...)				gLogInst->debug_fwprintf(cont, __VA_ARGS__)
 #define clog(cont, ...)				gLogInst->debug_wprintf(cont, __VA_ARGS__)
 
+#define mlog_a(cont, ...)			gLogInst->debug_fprintf(cont, __VA_ARGS__)
+
 #define mwinapi_fail(call)			gLogInst->debug_fwprintf(L"%s failed with error code %d.\n", call, GetLastError())
 #define cwinapi_fail(call)			gLogInst->debug_fprintf(L"%s failed with error code %d.\n", call, GetLastError())
 
@@ -163,7 +165,9 @@ icepicklog* gLogInst = nullptr;
 									gLogInst->init();
 #else
 #define mlog(cont, ...)	
-#define clog(cont, ...) 
+#define clog(cont, ...)
+
+#define mlog_a(cont, ...)
 
 #define mwinapi_fail(call)
 #define cwinapi_fail(call)

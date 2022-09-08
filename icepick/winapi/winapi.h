@@ -11,7 +11,7 @@ public:
 	bool  ps_win32_close_handle(HANDLE Handle);
 	
 	void* ps_win32_allocate_memory(void* BaseAddress, size_t Size, uint32_t AllocType, uint32_t Protect);
-	bool  ps_win32_protect_memory(void* BaseAddress, size_t Size, uint32_t NewProtect, uint32_t* OldProtect);
+	bool  ps_win32_protect_memory(void* BaseAddress, size_t Size, uint32_t NewProtect, PULONG OldProtect);
 	bool  ps_win32_free_memory(void* BaseAddress, size_t Size, uint32_t FreeType);
 
 	HANDLE ps_win32_create_file(const wchar_t* FileName, uint32_t DesiredAccess, uint32_t ShareMode, 

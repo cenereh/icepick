@@ -1,4 +1,5 @@
 #include "syscall.h"
+#include "../log.h"
 
 #include "external/macros.h"
 
@@ -24,6 +25,7 @@ bool syscall_handler::InitSyscallTable()
 
     if (ntdllBaseAddress == nullptr)
     {
+        mwinapi_fail(L"GetModuleHandle");
         return false;
     }
 
@@ -34,6 +36,7 @@ bool syscall_handler::InitSyscallTable()
     // Check the magic number and signature (to potentially identify a bad pointer)
     if (ntdllDosHeader->e_magic != IMAGE_DOS_SIGNATURE || ntdllNtHeaders->Signature != IMAGE_NT_SIGNATURE)
     {
+        mlog(L"Bad Ntdll headers! Aborting syscall initalization...\n");
         return false;
     }
 
@@ -75,6 +78,10 @@ bool syscall_handler::InitSyscallTable()
             // Read the syscall number and add to the table
             SyscallNumber = _RAWDWR(_PTR(FunctionReadBuffer) + 0x4);
             _syscallTable.emplace(NameOfFunction, SyscallNumber);
+
+#ifdef VERBOSE
+            mlog_a("Function %s sysnumber 0x%04x", NameOfFunction, SyscallNumber);
+#endif
         }
 
     }

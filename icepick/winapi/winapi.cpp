@@ -2,10 +2,23 @@
 #include "../ntdll/nt.h"
 #include "../ntdll/prototypes.h"
 #include "../external/macros.h"
+#include "../../log.h"
 
 #include <string>
 
 #define OWN_PROCESS				_H(-1)
+
+#ifdef WINAPI_VERBOSE
+
+#define winlog(syscall, status)			mlog(L"Direct sytstem call %s failed with status 0x%08x.\n", syscall, status)
+#define awinlog(syscall, status)		mlog_a("Direct sytstem call %s failed with status 0x%08x.\n", syscall, status)
+
+#else
+
+#define winlog(syscall, status)
+#define awinlog(syscall, status)
+
+#endif
 
 winapi::winapi() :
 	_systemCaller(nullptr)
@@ -33,7 +46,7 @@ bool winapi::ps_win32_close_handle(HANDLE Handle)
 
 		if (Status != STATUS_SUCCESS)
 		{
-			// Should probably log the error here
+			winlog(L"NtClose", Status)
 			return false;
 		}
 		else
@@ -68,6 +81,7 @@ void* winapi::ps_win32_allocate_memory(void* BaseAddress, size_t Size, uint32_t 
 		if (Status != STATUS_SUCCESS)
 		{
 			// Should probably log the error here
+			winlog(L"NtAllocateVirtualMemory", Status)
 			return nullptr;
 		}
 		else
@@ -90,7 +104,7 @@ void* winapi::ps_win32_allocate_memory(void* BaseAddress, size_t Size, uint32_t 
 /// <param name="NewProtect">New protection mask to assign</param>
 /// <param name="OldProtect">Pointer to a variable that will hold the old protection mask</param>
 /// <returns>true if memory protection has been changed successfully, false if not</returns>
-bool winapi::ps_win32_protect_memory(void* BaseAddress, size_t Size, uint32_t NewProtect, uint32_t* OldProtect)
+bool winapi::ps_win32_protect_memory(void* BaseAddress, size_t Size, uint32_t NewProtect, PULONG OldProtect)
 {
 	if (_systemCaller != nullptr)
 	{
@@ -102,6 +116,7 @@ bool winapi::ps_win32_protect_memory(void* BaseAddress, size_t Size, uint32_t Ne
 
 		if (Status != STATUS_SUCCESS)
 		{
+			winlog(L"NtProtectVirtualMemory", Status)
 			return false;
 		}
 		else
@@ -135,6 +150,7 @@ bool winapi::ps_win32_free_memory(void* BaseAddress, size_t Size, uint32_t FreeT
 
 		if (Status != STATUS_SUCCESS)
 		{
+			winlog(L"NtFreeVirtualMemory", Status)
 			return false;
 		}
 		else
@@ -229,6 +245,7 @@ HANDLE winapi::ps_win32_create_file(const wchar_t* FileName, uint32_t DesiredAcc
 
 		if (Status != STATUS_SUCCESS)
 		{
+			winlog(L"NtCreateFile", Status)
 			return INVALID_HANDLE_VALUE;
 		}
 		else
@@ -274,6 +291,7 @@ bool winapi::ps_win32_get_file_size(HANDLE FileHandle, uint32_t* Size)
 			else
 			{
 				// Bad pointer passed as parameter, return false
+				winlog(L"NtGetFileSize", Status)
 				return false;
 			}
 		}
@@ -327,6 +345,7 @@ bool winapi::ps_win32_read_file(HANDLE FileHandle, void* Buffer, uint32_t ToRead
 				if (Status != STATUS_SUCCESS)
 				{
 					// Not sure what to do if WaitForSingleObject fails
+					winlog(L"NtWaitForSingleObject", Status)
 					return false;
 				}
 				else
@@ -378,6 +397,7 @@ wchar_t* winapi::ps_win32_get_module_name_w(const wchar_t* ModuleName)
 	}
 	else
 	{
+		mwinapi_fail(L"GetCurrentDirectoryW");
 		return nullptr;
 	}
 }
