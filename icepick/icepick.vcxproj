@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;ICEPICK_STUB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="external\macros.h" />
     <ClInclude Include="external\skCrypt.h" />
+    <ClInclude Include="filesystem.h" />
     <ClInclude Include="ntdll\nt.h" />
     <ClInclude Include="ntdll\prototypes.h" />
     <ClInclude Include="syscall.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="winapi\winapi.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="syscall.cpp" />
     <ClCompile Include="unpack.cpp" />

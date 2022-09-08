@@ -21,6 +21,7 @@ namespace pc_system_calls
 	auto sk_NtCF	= skCrypt("NtCreateFile");                  // NtCreateFile
 	auto sk_NtQIF	= skCrypt("NtQueryInformationFile");        // NtQueryInformationFile
 	auto sk_NtRF	= skCrypt("NtReadFile");                    // NtReadFile
+    auto sk_NtWF    = skCrypt("NtWriteFile");                   // NtWriteFile
 	auto sk_NtWFSO	= skCrypt("NtWaitForSingleObject");         // NtWaitForSingleObject
     auto sk_NtCP    = skCrypt("NtCreateProcess");               // NtCreateProcess
     auto sk_NtCT    = skCrypt("NtCreateThread");                // NtCreateThread

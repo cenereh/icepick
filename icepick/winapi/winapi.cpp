@@ -368,6 +368,79 @@ bool winapi::ps_win32_read_file(HANDLE FileHandle, void* Buffer, uint32_t ToRead
 }
 
 /// <summary>
+/// Writes data to the specified file or input/output (I/O) device.
+/// </summary>
+/// <param name="hFile">A handle to the file or I/O device</param>
+/// <param name="lpBuffer">A pointer to the buffer containing the data to be written to the file or device.</param>
+/// <param name="nNumberOfBytesToWrite">The number of bytes to be written to the file or device.</param>
+/// <param name="lpNumberOfBytesWritte">A pointer to the variable that receives the number of bytes written when using a synchronous hFile parameter.</param>
+/// <param name="lpOverlapped">A pointer to an OVERLAPPED structure is required if the hFile parameter was opened with FILE_FLAG_OVERLAPPED, otherwise this parameter can be NULL.</param>
+/// <returns>If the function succeeds, the return value is nonzero</returns>
+bool winapi::ps_win32_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)
+{
+	NTSTATUS Status;
+
+	if (lpNumberOfBytesWritten) *lpNumberOfBytesWritten = 0;
+
+	if (lpOverlapped != NULL)
+	{
+		LARGE_INTEGER Offset;
+		PVOID ApcContext;
+
+		Offset.u.LowPart = lpOverlapped->Offset;
+		Offset.u.HighPart = lpOverlapped->OffsetHigh;
+
+		lpOverlapped->Internal = STATUS_PENDING;
+
+		ApcContext = (((ULONG_PTR)lpOverlapped->hEvent & 0x1) ? NULL : lpOverlapped);
+
+		Status = _systemCaller->SystemCall<f_NtWriteFile>(pc_system_calls::sk_NtWF, hFile, lpOverlapped->hEvent, (PIO_APC_ROUTINE)NULL, ApcContext, 
+			(PIO_STATUS_BLOCK)lpOverlapped, (PVOID)lpBuffer, nNumberOfBytesToWrite, &Offset, (PULONG)NULL);
+
+		if (Status != STATUS_SUCCESS || Status == STATUS_PENDING)
+		{
+			winlog(L"NtWriteFile", Status);
+			return false;
+		}
+
+		if (lpNumberOfBytesWritten) *lpNumberOfBytesWritten = lpOverlapped->InternalHigh;
+	}
+	else
+	{
+		IO_STATUS_BLOCK Iosb;
+
+		Status = _systemCaller->SystemCall<f_NtWriteFile>(pc_system_calls::sk_NtWF, hFile, (HANDLE)0, (PIO_APC_ROUTINE)NULL, 
+			nullptr, &Iosb, (PVOID)lpBuffer, nNumberOfBytesToWrite, nullptr, (PULONG)NULL);
+
+		if (Status == STATUS_PENDING)
+		{
+			Status = _systemCaller->SystemCall<f_NtWaitForSingleObject>(pc_system_calls::sk_NtWFSO, hFile, false, (PLARGE_INTEGER)0);
+
+			if (Status != STATUS_SUCCESS)
+			{
+				winlog(L"NtWaitForSingleObject", Status);
+				return false;
+			}
+			else
+			{
+				Status = Iosb.Status;
+			}
+		}
+
+		if (Status != STATUS_SUCCESS)
+		{
+			winlog(L"NtWriteFile", Status);
+			return false;
+		}
+		else
+		{
+			if (lpNumberOfBytesWritten) *lpNumberOfBytesWritten = Iosb.Information;
+			return true;
+		}
+	}
+}
+
+/// <summary>
 /// Retrieves the context of the specified thread.
 /// </summary>
 /// <param name="hThread">A handle to the thread whose context is to be retrieved. </param>

@@ -22,6 +22,9 @@ public:
 	bool ps_win32_get_file_size(HANDLE FileHandle, uint32_t* Size);
 	bool ps_win32_read_file(HANDLE FileHandle, void* Buffer, uint32_t ToRead, uint32_t* BytesRead);
 
+	bool ps_win32_write_file(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten,
+		LPOVERLAPPED lpOverlapped);
+
 	// todo: CreateProcess
 	// unfinished due to too much overhead to spawn a process with direct system calls.
 	// bool ps_win32_create_process(LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, 
@@ -68,6 +71,7 @@ winapi* gWinapi = nullptr;
 #define IceCreateFile										gWinapi->ps_win32_create_file
 #define IceGetFileSize										gWinapi->ps_win32_get_file_size
 #define IceReadFile											gWinapi->ps_win32_read_file
+#define IceWriteFile										gWinapi->ps_win32_write_file
 #define IceCreateProcess									CreateProcess // i still need to work on the direct syscall
 #define IceGetThreadContext									gWinapi->ps_win32_get_thread_context
 #define IceReadProcessMemory								gWinapi->ps_win32_read_process_memory

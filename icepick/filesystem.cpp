@@ -1,9 +1,9 @@
 #include "filesystem.h"
-#include <Windows.h>
-
 #include "../log.h"
 
 #ifndef ICEPICK_STUB
+
+#include <Windows.h>
 
 /// <summary>
 /// Reads a file from disk
@@ -77,6 +77,8 @@ bool filesystem::FsWriteFile(const std::wstring Path, uint8_t* Buffer, uint32_t 
 
 #else
 
+#include "winapi/winapi.h"
+
 /// <summary>
 /// Reads a file from disk
 /// </summary>
@@ -107,7 +109,7 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
         return false;
     }
 
-    if (!IceReadFile(FileHandle, *Buffer, Size, nullptr, nullptr))
+    if (!IceReadFile(FileHandle, *Buffer, Size, nullptr))
     {
         return false;
     }
