@@ -145,11 +145,13 @@
     <ClInclude Include="ntdll\nt.h" />
     <ClInclude Include="ntdll\prototypes.h" />
     <ClInclude Include="syscall.h" />
+    <ClInclude Include="unpack.h" />
     <ClInclude Include="winapi\winapi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="syscall.cpp" />
+    <ClCompile Include="unpack.cpp" />
     <ClCompile Include="winapi\winapi.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

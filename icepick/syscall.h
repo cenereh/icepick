@@ -22,6 +22,12 @@ namespace pc_system_calls
 	auto sk_NtQIF	= skCrypt("NtQueryInformationFile");        // NtQueryInformationFile
 	auto sk_NtRF	= skCrypt("NtReadFile");                    // NtReadFile
 	auto sk_NtWFSO	= skCrypt("NtWaitForSingleObject");         // NtWaitForSingleObject
+    auto sk_NtCP    = skCrypt("NtCreateProcess");               // NtCreateProcess
+    auto sk_NtCT    = skCrypt("NtCreateThread");                // NtCreateThread
+    auto sk_NtGTC   = skCrypt("NtGetThreadContext");            // NtGetThreadContext
+    auto sk_NtRVM   = skCrypt("NtReadVirtualMemory");           // NtReadVirtualMemory
+    auto sk_NtWVM   = skCrypt("NtWriteVirtualMemory");          // NtWriteVirtualMemory
+    auto sk_NtRT    = skCrypt("NtResumeThread");                // NtResumeThread
 }
 
 class syscall_handler

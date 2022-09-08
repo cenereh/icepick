@@ -20,3 +20,23 @@ typedef NTSTATUS(*f_NtFlushInstructionCache)(HANDLE ProcessHandle, LPCVOID lpBas
 typedef NTSTATUS(*f_NtSetContextThread)(HANDLE ThreadHandle, PCONTEXT ThreadContext);
 typedef NTSTATUS(*f_NtResumeThread)(HANDLE ThreadHandle, PULONG SuspendCount);
 typedef NTSTATUS(*f_NtWriteFile)(HANDLE hFile, HANDLE hEvent, PIO_APC_ROUTINE IoApcRoutine, PVOID IoApcContext, PIO_STATUS_BLOCK pIoStatusBlock, PVOID WriteBuffer, ULONG WriteBufferLength, PLARGE_INTEGER FileOffset, PULONG LockOperationKey);
+
+typedef NTSTATUS(*f_NtCreateProcess)	(	OUT PHANDLE 	ProcessHandle,
+IN ACCESS_MASK 	DesiredAccess,
+IN POBJECT_ATTRIBUTES ObjectAttributes 	OPTIONAL,
+IN HANDLE 	ParentProcess,
+IN BOOL 	InheritObjectTable,
+IN HANDLE SectionHandle 	OPTIONAL,
+IN HANDLE DebugPort 	OPTIONAL,
+IN HANDLE ExceptionPort 	OPTIONAL
+);
+
+typedef NTSTATUS(*f_NtCreateThread) (
+  OUT PHANDLE             ThreadHandle,
+  IN ACCESS_MASK          DesiredAccess,
+  IN POBJECT_ATTRIBUTES   ObjectAttributes OPTIONAL,
+  IN HANDLE               ProcessHandle,
+  OUT PCLIENT_ID          ClientId,
+  IN PCONTEXT             ThreadContext,
+  IN PINITIAL_TEB         InitialTeb,
+  IN BOOLEAN              CreateSuspended );

@@ -11,6 +11,12 @@ typedef struct _icepick_crypt_data
 	uint32_t OffsetToExecutable;				// Offset to the packed executable within raw memory.
 	uint32_t SizeOfExecutable;					// Size of the packed executable within raw memory
 
+	// todo: Flag for .NET support
+
+	// todo: Offset to built-in .NET stub.
+
+	// todo: Size of built-in .NET stub.
+
 } icepick_crypt_data, *picepick_crypt_data;
 
 static class encrypt

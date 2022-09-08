@@ -368,6 +368,243 @@ bool winapi::ps_win32_read_file(HANDLE FileHandle, void* Buffer, uint32_t ToRead
 }
 
 /// <summary>
+/// Retrieves the context of the specified thread.
+/// </summary>
+/// <param name="hThread">A handle to the thread whose context is to be retrieved. </param>
+/// <param name="lpContext">A pointer to a CONTEXT structure</param>
+/// <returns>If the function succeeds, the return value is nonzero.</returns>
+bool winapi::ps_win32_get_thread_context(HANDLE hThread, LPCONTEXT lpContext)
+{
+	NTSTATUS Status;
+
+	Status = _systemCaller->SystemCall<f_NtGetContextThread>(pc_system_calls::sk_NtGTC, hThread, lpContext);
+
+	if (Status != STATUS_SUCCESS)
+	{
+		winlog(L"NtGetContextThread", Status);
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+/// <summary>
+/// Sets the context for the specified thread.
+/// </summary>
+/// <param name="hThread">A handle to the thread whose context is to be set.</param>
+/// <param name="lpContext">A pointer to a CONTEXT structure that contains the context to be set in the specified thread.</param>
+/// <returns>If the context was set, the return value is nonzero.</returns>
+bool winapi::ps_win32_set_thread_context(HANDLE hThread, LPCONTEXT lpContext)
+{
+	NTSTATUS Status;
+
+	Status = _systemCaller->SystemCall<f_NtSetContextThread>(pc_system_calls::sk_NtGTC, hThread, lpContext);
+
+	if (Status != STATUS_SUCCESS)
+	{
+		winlog(L"NtSetContextThread", Status);
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+/// <summary>
+/// Reads an external process memory
+/// </summary>
+/// <param name="hProcess">A handle to the process with memory that is being read.</param>
+/// <param name="lpBaseAddress">A pointer to the base address in the specified process from which to read.</param>
+/// <param name="lpBuffer">A pointer to a buffer that receives the contents from the address space of the specified process.</param>
+/// <param name="nSize">The number of bytes to be read from the specified process.</param>
+/// <param name="lpNumberOfBytesRead">A pointer to a variable that receives the number of bytes transferred into the specified buffer. If lpNumberOfBytesRead is NULL, the parameter is ignored.</param>
+/// <returns>If the function succeeds, the return value is nonzero.</returns>
+bool winapi::ps_win32_read_process_memory(HANDLE hProcess, LPCVOID lpBaseAddress, LPVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead)
+{
+	NTSTATUS Status;
+	Status = _systemCaller->SystemCall<f_NtReadVirtualMemory>(pc_system_calls::sk_NtRVM, hProcess, (PVOID)lpBaseAddress, 
+		lpBuffer, nSize, &nSize);
+
+	if (Status != STATUS_SUCCESS)
+	{
+		winlog(L"NtReadVirtualMemory", Status);
+		return false;
+	}
+	else
+	{
+		if (lpNumberOfBytesRead) *lpNumberOfBytesRead = nSize;
+		return true;
+	}
+}
+
+/// <summary>
+/// Writes data to an area of memory in a specified process.
+/// </summary>
+/// <param name="hProcess">A handle to the process memory to be modified.</param>
+/// <param name="lpBaseAddress">A pointer to the base address in the specified process to which data is written.</param>
+/// <param name="lpBuffer">A pointer to the buffer that contains data to be written in the address space of the specified process.</param>
+/// <param name="nSize">The number of bytes to be written to the specified process.</param>
+/// <param name="lpNumberOfBytesWritten">A pointer to a variable that receives the number of bytes transferred into the specified process.</param>
+/// <returns>If the function succeeds, the return value is nonzero.</returns>
+bool winapi::ps_win32_write_process_memory(HANDLE hProcess, LPVOID lpBaseAddress, LPCVOID lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten)
+{
+	NTSTATUS Status;
+	ULONG OldValue;
+	SIZE_T RegionSize;
+	PVOID Base;
+	BOOL Unprotect;
+
+	RegionSize = nSize;
+	Base = lpBaseAddress;
+
+	Status = _systemCaller->SystemCall<f_NtProtectVirtualMemory>(pc_system_calls::sk_NtPVM, hProcess, &Base, 
+		&RegionSize, PAGE_EXECUTE_READWRITE, &OldValue);
+
+	if (Status != STATUS_SUCCESS)
+	{
+		Unprotect = OldValue & (PAGE_READWRITE |
+                                 PAGE_WRITECOPY |
+                                 PAGE_EXECUTE_READWRITE |
+                                 PAGE_EXECUTE_WRITECOPY) ? FALSE : TRUE;
+
+		if (!Unprotect)
+		{
+			Status = _systemCaller->SystemCall<f_NtProtectVirtualMemory>(pc_system_calls::sk_NtPVM, hProcess, &Base, 
+					&RegionSize, OldValue, &OldValue);
+
+			Status = _systemCaller->SystemCall<f_NtWriteVirtualMemory>(pc_system_calls::sk_NtWVM, hProcess, lpBaseAddress,
+				(LPVOID)lpBuffer, nSize, &nSize);
+
+			if (Status != STATUS_SUCCESS)
+			{
+				winlog(L"NtWriteVirtualMemory", Status);
+				return false;
+			}
+			else
+			{
+				if (lpNumberOfBytesWritten) *lpNumberOfBytesWritten = nSize;
+				return true;
+			}
+		}
+		else
+		{
+			if (OldValue & (PAGE_NOACCESS | PAGE_READONLY))
+			{
+				_systemCaller->SystemCall<f_NtProtectVirtualMemory>(pc_system_calls::sk_NtPVM, hProcess, &Base, &RegionSize, OldValue, 
+					&OldValue);
+
+				winlog(L"NtProtectVirtualMemory", Status);
+				return false;
+			}
+			else
+			{
+				Status = _systemCaller->SystemCall<f_NtWriteVirtualMemory>(pc_system_calls::sk_NtWVM, hProcess, lpBaseAddress,
+					(LPVOID)lpBuffer, nSize, &nSize);
+
+				Status = _systemCaller->SystemCall<f_NtProtectVirtualMemory>(pc_system_calls::sk_NtPVM, hProcess, &Base, 
+						&RegionSize, OldValue, &OldValue);
+
+				if (Status != STATUS_SUCCESS)
+				{
+					winlog(L"NtWriteVirtualMemory");
+					return false;
+				}
+				else
+				{
+					if (lpNumberOfBytesWritten) *lpNumberOfBytesWritten = nSize;
+					return true;
+				}
+			}
+		}
+	}
+	else
+	{
+		winlog(L"NtProtectVirtualMemory", Status);
+		return false;
+	}
+	
+}
+
+// todo: da fare dopo: troppa roba.
+/// <summary>
+/// Creates a new system process.
+/// </summary>
+/// <param name="lpApplicationName">Path of the application to create a process from</param>
+/// <param name="lpCommandLine">Command to supply to the process</param>
+/// <param name="lpProcessAttributes">Security attributes of the process.</param>
+/// <param name="lpThreadAttributes">you know</param>
+/// <param name="bInheritHandles">Inherit handles from parent process</param>
+/// <param name="dwCreationFlags">The flags that control the priority class and the creation of the process.</param>
+/// <param name="lpEnvironment">A pointer to the environment block for the new process.</param>
+/// <param name="lpCurrentDirectory">The full path to the current directory for the process.</param>
+/// <param name="lpStartupInfo">A pointer to a STARTUPINFO or STARTUPINFOEX structure.</param>
+/// <param name="lpProcessInformation">A pointer to a PROCESS_INFORMATION structure that receives identification information about the new process.</param>
+/// <returns>If the function succeeds, the return value is nonzero.</returns>
+//bool winapi::ps_win32_create_process(LPCWSTR lpApplicationName, LPWSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory, LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
+//{
+//	NTSTATUS Status;
+//	HANDLE ProcessHandle, ThreadHandle;
+//	OBJECT_ATTRIBUTES ObjectAttributes;
+//	ULONG Flags;
+//	BOOL InJob;
+//	UNICODE_STRING ntPathU;
+//	CLIENT_ID ClientId;
+//	CONTEXT Context;
+//	INITIAL_TEB InitialTeb;
+//
+//	Status = _systemCaller->SystemCall<f_NtCreateThread>(&ThreadHandle, THREAD_ALL_ACCESS, NULL, ProcessHandle, &ClientId, 
+//		&Context, &InitialTeb, TRUE);
+//
+//	std::wstring ntPath = ps_dos_path_to_nt_path_w(lpApplicationName);
+//
+//	ntPathU.Buffer = (PWSTR)ntPath.c_str();
+//	ntPathU.Length = ntPath.size() << 1;
+//
+//	InitializeObjectAttributes(&ObjectAttributes, &ntPathU, OBJ_CASE_INSENSITIVE, 0, 0);
+//
+//	Status = _systemCaller->SystemCall<f_NtCreateProcess>
+//		(pc_system_calls::sk_NtCP, &ProcessHandle, PROCESS_ALL_ACCESS, NULL, (HANDLE)-1, FALSE, NULL,
+//			NULL, NULL);
+//
+//	if (Status != STATUS_SUCCESS)
+//	{
+//		winlog(L"NtCreateProcess", Status);
+//		return false;
+//	}
+//	else
+//	{
+//		lpProcessInformation->hProcess = ProcessHandle;
+//
+//	}
+//}
+
+/// <summary>
+/// Resumes a thread
+/// </summary>
+/// <param name="hThread">Handle to the thread to resume</param>
+/// <returns>If the function succeeds, the return value is the thread's previous suspend count. If the function fails, the return value is (DWORD) -1</returns>
+DWORD winapi::ps_win32_resume_thread(HANDLE hThread)
+{
+	ULONG PreviousResumeCount;
+	NTSTATUS Status;
+
+	Status = _systemCaller->SystemCall<f_NtResumeThread>(pc_system_calls::sk_NtRT, hThread, &PreviousResumeCount);
+
+	if (Status != STATUS_SUCCESS)
+	{
+		winlog("NtResumeThread", Status);
+		return -1;
+	}
+	else
+	{
+		return PreviousResumeCount;
+	}
+}
+
+/// <summary>
 /// Loads a function from a DLL loaded in the PEB.
 /// </summary>
 /// <param name="ModuleName">Name of the DLL to load the function from</param>
@@ -400,6 +637,18 @@ wchar_t* winapi::ps_win32_get_module_name_w(const wchar_t* ModuleName)
 		mwinapi_fail(L"GetCurrentDirectoryW");
 		return nullptr;
 	}
+}
+
+/// <summary>
+/// Gets the current working directory.
+/// </summary>
+/// <returns>The current working directory, or nullptr if fails.</returns>
+wchar_t* winapi::ps_win32_get_current_path_w()
+{
+	// Fully qualified path retrieved from the PEB
+	WCHAR modulePath[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, modulePath);
+	return modulePath;
 }
 
 /// <summary>

@@ -33,6 +33,9 @@
     <ClInclude Include="ntdll\prototypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unpack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="syscall.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unpack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
