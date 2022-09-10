@@ -99,5 +99,6 @@ winapi* gWinapi = nullptr;
 
 // It uses GetProcAddress on it's own so there is no point in making two different definitions.
 #define IceGetProcAddress									GetProcAddress(GetModuleHandle(ModuleName), FunctionName);
+#define IceGetCurrentPathW									gWinapi->ps_win32_get_current_path_w
 
 
