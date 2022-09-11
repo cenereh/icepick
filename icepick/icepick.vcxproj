@@ -144,6 +144,7 @@
     <ClInclude Include="external\macros.h" />
     <ClInclude Include="external\skCrypt.h" />
     <ClInclude Include="filesystem.h" />
+    <ClInclude Include="mapper.h" />
     <ClInclude Include="ntdll\nt.h" />
     <ClInclude Include="ntdll\prototypes.h" />
     <ClInclude Include="syscall.h" />
@@ -154,6 +155,7 @@
     <ClCompile Include="encrypt.cpp" />
     <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mapper.cpp" />
     <ClCompile Include="syscall.cpp" />
     <ClCompile Include="unpack.cpp" />
     <ClCompile Include="winapi\winapi.cpp" />

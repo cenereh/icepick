@@ -42,6 +42,9 @@
     <ClInclude Include="encrypt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="syscall.cpp">
@@ -60,6 +63,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encrypt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

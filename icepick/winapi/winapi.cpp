@@ -678,14 +678,49 @@ DWORD winapi::ps_win32_resume_thread(HANDLE hThread)
 }
 
 /// <summary>
-/// Loads a function from a DLL loaded in the PEB.
+/// Loads a function from a DLL.
 /// </summary>
 /// <param name="ModuleName">Name of the DLL to load the function from</param>
 /// <param name="FunctionName">Name of the function to load</param>
-/// <returns></returns>
+/// <returns>A valid HMODULE pointer if successful, or nullptr if not.</returns>
 void* winapi::ps_win32_resolve_function(const wchar_t* ModuleName, const char* FunctionName)
 {
-	return GetProcAddress(GetModuleHandle(ModuleName), FunctionName);
+	HMODULE Mod = GetModuleHandle(ModuleName);
+
+	if (Mod == nullptr)
+	{
+		Mod = LoadLibrary(ModuleName);
+
+		if (Mod == nullptr)
+		{
+			return nullptr;
+		}
+	}
+
+	return GetProcAddress(Mod, FunctionName);
+}
+
+/// <summary>
+/// Loads a function from a DLL (ascii support).
+/// </summary>
+/// <param name="ModuleName">Name of the DLL to load the function from</param>
+/// <param name="FunctionName">Name of the function to load</param>
+/// <returns>A valid HMODULE pointer if successful, or nullptr if not.</returns>
+void* winapi::ps_win32_resolve_function(const char* ModuleName, const char* FunctionName)
+{
+	HMODULE Mod = GetModuleHandleA(ModuleName);
+
+	if (Mod == nullptr)
+	{
+		Mod = LoadLibraryA(ModuleName);
+
+		if (Mod == nullptr)
+		{
+			return nullptr;
+		}
+	}
+
+	return GetProcAddress(Mod, FunctionName);
 }
 
 /// <summary>

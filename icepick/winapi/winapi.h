@@ -44,6 +44,7 @@ public:
 	DWORD ps_win32_resume_thread(HANDLE hThread);
 
 	void* ps_win32_resolve_function(const wchar_t* ModuleName, const char* FunctionName);
+	void* ps_win32_resolve_function(const char* ModuleName, const char* FunctionName);
 
 	wchar_t* ps_win32_get_module_name_w(const wchar_t* ModuleName);
 
@@ -97,8 +98,8 @@ winapi* gWinapi = nullptr;
 
 #endif // !RAW_WINAPI
 
-// It uses GetProcAddress on it's own so there is no point in making two different definitions.
-#define IceGetProcAddress									GetProcAddress(GetModuleHandle(ModuleName), FunctionName);
+
+#define IceGetProcAddress									gWinapi->ps_win32_resolve_function
 #define IceGetCurrentPathW									gWinapi->ps_win32_get_current_path_w
 
 
