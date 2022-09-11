@@ -80,7 +80,7 @@ bool syscall_handler::InitSyscallTable()
             _syscallTable.emplace(NameOfFunction, SyscallNumber);
 
 #ifdef VERBOSE
-            mlog_a("Function %s sysnumber 0x%04x", NameOfFunction, SyscallNumber);
+            mlog_a("Function %s sysnumber 0x%04x\n", NameOfFunction, SyscallNumber);
 #endif
         }
 

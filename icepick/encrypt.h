@@ -5,7 +5,7 @@ constexpr uint8_t k1024BitKeySz = 128;
 
 typedef struct _icepick_crypt_data
 {
-	const uint32_t Id = 0x09072022;				// Signature of the crypt data.
+	const char Id[8] = "kwszack";				// Signature of the crypt data.
 
 	uint8_t EncryptionKey[k1024BitKeySz];		// XOR Encryption/Decryption key.
 	uint32_t OffsetToExecutable;				// Offset to the packed executable within raw memory.

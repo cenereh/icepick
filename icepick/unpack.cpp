@@ -19,13 +19,14 @@ picepick_crypt_data FindEmbeddedData(uint8_t* Self, uint32_t Size)
 {
 	// Parse the whole executable until the 0x09072022 signature is found
 
-	uint32_t Sig = 0;
+	auto sigToFind = skCrypt("kwszack");
+	const char* Sig = 0;
 
-	for (int i = 0; i < Size && Sig != ICEPICK_SIG; i += sizeof(uint32_t))
+	for (int i = 0; i < Size; i += 8)
 	{
-		Sig = _DW(Self + i);
+		Sig = (const char*)(Self + i);
 
-		if (Sig == ICEPICK_SIG)
+		if (strcmp(Sig, _SKC(sigToFind)) == 0)
 		{
 			mlog(L"Found valid embedded data signature at 0x%p.\n", Self + i);
 			return (picepick_crypt_data)(Self + i);
@@ -46,10 +47,10 @@ uint8_t* unpack::UnpackPayload(uint32_t& SizeOfPayload)
 	uint8_t* Self;
 	uint32_t Size;
 
-#ifndef DEBUG
+#ifndef _DEBUG
 	std::wstring SelfPath = IceGetCurrentPathW();
 #else
-	std::wstring SelfPath = L"C:\\Users\\rab00t\\source\\repos\\icepick\\x64\\Debug\\output.exe";
+	std::wstring SelfPath = L"C:\\Users\\off4a\\source\\repos\\icepick\\x64\\Debug\\output.exe";
 #endif
 
 	if (!filesystem::FsReadFile(SelfPath.c_str(), &Self, Size))

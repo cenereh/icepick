@@ -95,9 +95,9 @@ bool filesystem::FsReadFile(const std::wstring Path, uint8_t** Buffer, uint32_t&
         return false;
     }
 
-    Size = IceGetFileSize(FileHandle, nullptr);
+    bool Result = IceGetFileSize(FileHandle, &Size);
 
-    if (Size == 0)
+    if (Result == false)
     {
         return false;
     }

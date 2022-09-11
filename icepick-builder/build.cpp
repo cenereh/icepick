@@ -34,6 +34,9 @@ bool build::BuildExe(const std::wstring InputPath, const std::wstring StubPath, 
     icepick_crypt_data crypt_data;
     encrypt::EncryptBuffer(&crypt_data, InputFile, InputSize);
 
+    crypt_data.SizeOfExecutable = InputSize;
+    crypt_data.OffsetToExecutable = StubSize + sizeof(icepick_crypt_data);
+
     uint32_t WriteSize = StubSize + sizeof(icepick_crypt_data) + InputSize;
     // Allocate a new buffer contaning both files and the data structure
     uint8_t* WriteBuffer = (uint8_t*)malloc(WriteSize);
